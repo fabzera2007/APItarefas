@@ -69,22 +69,22 @@ app.use(cors());
 // --- Conexão com o Banco de Dados SQLite ---
 
 // Abre uma conexão com o banco de dados.
+// Abre uma conexão com o banco de dados.
 const db = new sqlite3.Database('./tasks.db', (err) => {
     if (err) {
         console.error('Erro ao abrir o banco de dados:', err.message);
     } else {
         console.log('Conectado ao banco de dados SQLite.');
 
-        // 1. Criação da Tabela tarefas
+        // 1. Criação da Tabela tarefas (agora com campos de calendário) - CORRIGIDA!
         db.run(`CREATE TABLE IF NOT EXISTS tarefas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             titulo TEXT NOT NULL,
             descricao TEXT,
-            data_evento TEXT NOT NULL,        
-            hora_inicio TEXT NOT NULL,         
-            hora_fim TEXT,                   
-            local TEXT,                        
-            data_vencimento TEXT NOT NULL,
+            data_evento TEXT NOT NULL,
+            hora_inicio TEXT NOT NULL,
+            hora_fim TEXT,
+            local TEXT,  -- <<< CORRIGIDO AQUI: SEM ESPAÇO EXTRA
             concluida INTEGER DEFAULT 0,
             data_criacao TEXT NOT NULL,
             user_id INTEGER NOT NULL,
@@ -93,10 +93,9 @@ const db = new sqlite3.Database('./tasks.db', (err) => {
             if (createTableErr) {
                 console.error('Erro ao criar a tabela tarefas:', createTableErr.message);
             } else {
-                console.log('Tabela tarefas verificada/criada com sucesso.');
+                console.log('Tabela tarefas (agora como eventos) verificada/criada com sucesso.');
 
-                // 2. Criação da Tabela usuarios (APENAS AQUI, DENTRO DO CALLBACK DE SUCESSO DE 'tarefas')
-                // Isso garante que a tabela 'tarefas' já foi criada antes de tentar criar 'usuarios'.
+                // 2. Criação da Tabela usuarios (ANINHADO AQUI, DENTRO DO CALLBACK DE SUCESSO DE 'tarefas')
                 db.run(`CREATE TABLE IF NOT EXISTS usuarios (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT NOT NULL UNIQUE,
@@ -117,14 +116,13 @@ const db = new sqlite3.Database('./tasks.db', (err) => {
 // POSTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 
 app.post('/tarefas', authenticateToken, (req, res) => {
-    // Desestrutura os dados do corpo da requisição (JSON enviado pelo frontend).
-    const { titulo, descricao, data_vencimento } = req.body;
+    // CORREÇÃO AQUI: Desestruture 'data_evento'
+    const { titulo, descricao, data_evento, hora_inicio, hora_fim, local } = req.body;
     const user_id = req.user.id;
 
-    // Validação básica: verifica se 'titulo' e 'data_vencimento' foram fornecidos.
-    if (!titulo || !data_vencimento) {
-        // Se não forem, retorna um erro 400 (Bad Request) com uma mensagem.
-        return res.status(400).json({ mensagem: 'Título e data de vencimento são obrigatórios.' });
+    // CORREÇÃO AQUI: Valide 'data_evento'
+    if (!titulo || !data_evento || !hora_inicio) {
+        return res.status(400).json({ mensagem: 'Título, data do evento e hora de início são obrigatórios.' });
     }
 
     // Gera a data de criação no formato 'YYYY-MM-DD'.
@@ -132,31 +130,42 @@ app.post('/tarefas', authenticateToken, (req, res) => {
 
     // Comando SQL para inserir uma nova tarefa.
     // Os '?' são placeholders para evitar injeção de SQL (segurança!).
-    const sql = `INSERT INTO tarefas (titulo, descricao, data_vencimento, concluida, data_criacao, user_id) VALUES (?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO tarefas (titulo, descricao, data_evento, hora_inicio, hora_fim, local, concluida, data_criacao, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     // 'db.run()' executa o comando SQL.
     // O array após 'sql' contém os valores que substituirão os '?'.
     // A função de callback (err) é executada após a inserção.
     // 'function(err)' com 'this.lastID' - Note que usamos uma 'function' tradicional para ter acesso ao 'this.lastID'.
-    db.run(sql, [titulo, descricao || '', data_vencimento, 0, data_criacao, user_id], function(err) {
+    db.run(sql, [
+        titulo,
+        descricao || null, // Se descricao não for fornecido, insere NULL
+        data_evento,
+        hora_inicio,
+        hora_fim || null,  // Se hora_fim não for fornecido, insere NULL
+        local || null,     // Se local não for fornecido, insere NULL
+        0, // concluida padrão como false (0 para SQLite)
+        data_criacao,
+        user_id
+    ], function(err) {
         if (err) {
             // Se houver erro na inserção, loga e retorna um erro 500 (Internal Server Error).
-            console.error('Erro ao inserir tarefa:', err.message);
-            return res.status(500).json({ mensagem: 'Erro interno do servidor ao criar tarefa.' });
-        }
-        // Retorna a tarefa criada com o ID gerado pelo banco de dados (this.lastID).
-        // 201 Created é o status HTTP para sucesso na criação de um recurso.
+            console.error('Erro ao inserir tarefa (evento):', err.message);
+            return res.status(500).json({ mensagem: 'Erro interno do servidor ao criar evento.', erro: err.message });  
+        } 
         res.status(201).json({
-            id: this.lastID, // ID gerado automaticamente pelo SQLite
+            id: this.lastID, // ID da nova linha inserida
             titulo,
-            descricao: descricao || '',
-            data_vencimento,
-            concluida: false, // Voltamos como false para o frontend (no BD é 0)
+            descricao: descricao || null,
+            data_evento,
+            hora_inicio,
+            hora_fim: hora_fim || null,
+            local: local || null,
+            concluida: false,
             data_criacao,
             user_id
         });
     });
-});
+}); 
 
 
 // POSTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
@@ -302,84 +311,113 @@ app.get('/tarefas/:id', authenticateToken, (req, res) => {
 app.put('/tarefas/:id', authenticateToken, (req, res) => {
     const id = parseInt(req.params.id);
     const user_id = req.user.id;
-    // Desestrutura TODOS os campos que esperamos que o frontend envie.
-    const { titulo, descricao, data_vencimento, concluida } = req.body;
+    // CORREÇÃO AQUI: Desestruture TODOS os novos campos
+    const { titulo, descricao, data_evento, hora_inicio, hora_fim, local, concluida } = req.body;
 
-    // Validação: Todos os campos são obrigatórios para um PUT completo.
-    if (titulo === undefined || descricao === undefined || data_vencimento === undefined || concluida === undefined) {
-        return res.status(400).json({ mensagem: 'Todos os campos (titulo, descricao, data_vencimento, concluida) são obrigatórios para atualização PUT.' });
+    // CORREÇÃO AQUI: Validação para PUT - todos os campos de evento são obrigatórios para uma ATUALIZAÇÃO COMPLETA
+    if (!titulo || !data_evento || !hora_inicio || concluida === undefined) { // Adicione checagem para hora_inicio e concluida
+        return res.status(400).json({ mensagem: 'Título, data do evento, hora de início e status de conclusão são obrigatórios para atualização PUT.' });
     }
 
-    // SQLite armazena booleanos como INTEGER (0 para false, 1 para true).
     const concluidaDB = concluida ? 1 : 0;
 
-    const sql = `UPDATE tarefas SET titulo = ?, descricao = ?, data_vencimento = ?, concluida = ? WHERE id = ? AND user_id = ?`;
+    const sql = `UPDATE tarefas SET
+        titulo = ?,
+        descricao = ?,
+        data_evento = ?,    <<<< CORRIGIDO AQUI
+        hora_inicio = ?,    <<<< NOVO CAMPO
+        hora_fim = ?,       <<<< NOVO CAMPO
+        local = ?,          <<<< NOVO CAMPO
+        concluida = ?
+        WHERE id = ? AND user_id = ?`;
 
-    // 'db.run()' é usado para UPDATE. O terceiro parâmetro 'function(err)' nos dá 'this.changes'.
-    db.run(sql, [titulo, descricao, data_vencimento, concluidaDB, id, user_id], function(err) {
-        if (err) {
-            console.error('Erro ao atualizar tarefa (PUT):', err.message);
-            return res.status(500).json({ mensagem: 'Erro interno do servidor.' });
-        }
-        // 'this.changes' indica o número de linhas afetadas (1 se a tarefa foi encontrada e atualizada, 0 caso contrário).
-        if (this.changes > 0) {
-            // Retorna a tarefa atualizada (você pode buscar ela do BD novamente ou retornar o que foi enviado).
-            // Para simplificar, retornamos os dados que foram enviados, com o ID.
-            res.json({ id, titulo, descricao, data_vencimento, concluida, user_id });
-        } else {
-            res.status(404).json({ mensagem: 'Tarefa não encontrada ou não pertence a este usuário.' });
-        }
+    db.run(sql, [
+        titulo,
+        descricao || null,
+        data_evento,
+        hora_inicio,
+        hora_fim || null,
+        local || null,
+        concluidaDB,
+        id,
+        user_id
+    ], function(err) {
+        // ... restante do código ...
     });
 });
 
 // 4. PATCHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
 
+// 4. PATCH /tarefas/:id - Atualizar parcialmente uma tarefa (evento) por ID para o usuário logado
 app.patch('/tarefas/:id', authenticateToken, (req, res) => {
-    const id = parseInt(req.params.id);
-    const user_id = req.user.id;
-    const updates = req.body; // O objeto 'updates' contém apenas os campos que o cliente quer mudar.
+    const id = parseInt(req.params.id); // Pega o ID do evento da URL
+    const user_id = req.user.id;      // Pega o ID do usuário do token JWT
+    const updates = req.body;         // O corpo da requisição com os campos que o cliente quer atualizar
 
-    // 1. Primeiro, vamos buscar a tarefa existente para ter os dados atuais.
-    db.get(`SELECT * FROM tarefas WHERE id = ? AND user_id = ?`, [id, user_id], (err, existingTarefa) => {
+    // 1. Verificação básica: se não houver campos para atualizar, retorne um erro
+    if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ mensagem: 'Nenhum campo fornecido para atualização.' });
+    }
+
+    // 2. Constrói dinamicamente a parte 'SET' da query SQL e os parâmetros
+    const setParts = []; // Array para armazenar as partes 'campo = ?'
+    const params = [];   // Array para armazenar os valores correspondentes
+
+    // Itera sobre os possíveis campos que podem ser atualizados
+    // Adicionei os novos campos de evento aqui
+    if (updates.titulo !== undefined) {
+        setParts.push('titulo = ?');
+        params.push(updates.titulo);
+    }
+    if (updates.descricao !== undefined) {
+        setParts.push('descricao = ?');
+        params.push(updates.descricao || null); // Permite definir descrição como nula
+    }
+    if (updates.data_evento !== undefined) { // <<< NOVO CAMPO: data_evento
+        setParts.push('data_evento = ?');
+        params.push(updates.data_evento);
+    }
+    if (updates.hora_inicio !== undefined) { // <<< NOVO CAMPO: hora_inicio
+        setParts.push('hora_inicio = ?');
+        params.push(updates.hora_inicio);
+    }
+    if (updates.hora_fim !== undefined) {    // <<< NOVO CAMPO: hora_fim
+        setParts.push('hora_fim = ?');
+        params.push(updates.hora_fim || null); // Permite definir hora_fim como nula
+    }
+    if (updates.local !== undefined) {       // <<< NOVO CAMPO: local
+        setParts.push('local = ?');
+        params.push(updates.local || null);    // Permite definir local como nulo
+    }
+    if (updates.concluida !== undefined) {
+        setParts.push('concluida = ?');
+        params.push(updates.concluida ? 1 : 0); // Converte booleano para 0 ou 1
+    }
+
+    // 3. Verifica se algum campo válido foi encontrado para atualização
+    if (setParts.length === 0) {
+        return res.status(400).json({ mensagem: 'Nenhum campo válido fornecido para atualização.' });
+    }
+
+    // 4. Constrói a query SQL final
+    const sql = `UPDATE tarefas SET ${setParts.join(', ')} WHERE id = ? AND user_id = ?`;
+
+    // 5. Adiciona o ID do evento e o ID do usuário aos parâmetros da query
+    params.push(id, user_id);
+
+    // 6. Executa a query SQL
+    db.run(sql, params, function(err) {
         if (err) {
-            console.error('Erro ao buscar tarefa para PATCH:', err.message);
-            return res.status(500).json({ mensagem: 'Erro interno do servidor.' });
+            console.error('Erro ao atualizar tarefa (evento) via PATCH:', err.message);
+            return res.status(500).json({ mensagem: 'Erro interno do servidor ao atualizar evento.', erro: err.message });
         }
-        if (!existingTarefa) {
-            return res.status(404).json({ mensagem: 'Tarefa não encontrada.' });
+        // 7. Verifica se alguma linha foi afetada (se o evento foi encontrado e atualizado)
+        if (this.changes === 0) {
+            // Se 0 linhas afetadas, significa que o evento não existe com esse ID OU não pertence ao usuário
+            return res.status(404).json({ mensagem: 'Evento não encontrado ou não pertence a este usuário.' });
         }
-
-        // 2. Cria um objeto com os novos valores, mesclando os existentes com os atualizados.
-        // Cuidado especial com 'concluida': se for enviado, converte para 0 ou 1.
-        const updatedFields = {
-            titulo: updates.titulo !== undefined ? updates.titulo : existingTarefa.titulo,
-            descricao: updates.descricao !== undefined ? updates.descricao : existingTarefa.descricao,
-            data_vencimento: updates.data_vencimento !== undefined ? updates.data_vencimento : existingTarefa.data_vencimento,
-            concluida: updates.concluida !== undefined ? (updates.concluida ? 1 : 0) : existingTarefa.concluida // Converte booleano
-        };
-
-        const sql = `UPDATE tarefas SET titulo = ?, descricao = ?, data_vencimento = ?, concluida = ? WHERE id = ? AND user_id = ?`;
-
-        db.run(sql, [
-            updatedFields.titulo,
-            updatedFields.descricao,
-            updatedFields.data_vencimento,
-            updatedFields.concluida,
-            id,
-            user_id
-        ], function(updateErr) {
-            if (updateErr) {
-                console.error('Erro ao atualizar tarefa (PATCH):', updateErr.message);
-                return res.status(500).json({ mensagem: 'Erro interno do servidor.' });
-            }
-            if (this.changes > 0) {
-                // Retorna a tarefa atualizada (convertendo 'concluida' para boolean novamente)
-                res.json({ ...updatedFields, id, concluida: updatedFields.concluida === 1, data_criacao: existingTarefa.data_criacao, user_id });
-            } else {
-                // Isso aconteceria se o ID não fosse encontrado (embora já checado acima)
-                res.status(404).json({ mensagem: 'Tarefa não encontrada após tentativa de atualização.' });
-            }
-        });
+        // 8. Retorna sucesso
+        res.status(200).json({ mensagem: 'Evento atualizado com sucesso.' });
     });
 });
 
