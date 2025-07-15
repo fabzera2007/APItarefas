@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Tarefas</title>
+    <style>
+        /* Estilos CSS básicos para a interface */
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f7f6; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2 { color: #007bff; text-align: center; margin-bottom: 20px; }
+        #tarefas-lista { list-style: none; padding: 0; }
+        #tarefas-lista li {
+            background-color: #e9ecef;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column; /* Para empilhar título/descrição e botões */
+            align-items: flex-start;
+            border: 1px solid #dee2e6;
+        }
+        #tarefas-lista li div:first-child { flex-grow: 1; margin-bottom: 10px; }
+        #tarefas-lista li div:last-child { display: flex; gap: 10px; }
+
+        .tarefa-concluida {
+            text-decoration: line-through;
+            color: #888;
+            background-color: #d4edda; /* Cor mais clara para tarefas concluídas */
+            border-color: #c3e6cb;
+        }
+        .tarefa-concluida strong { color: #666; }
+        .tarefa-concluida p { color: #999; }
+
+        button { padding: 8px 12px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; transition: background-color 0.2s ease; }
+        .btn-delete { background-color: #dc3545; color: white; }
+        .btn-delete:hover { background-color: #c82333; }
+        .btn-toggle { background-color: #007bff; color: white; }
+        .btn-toggle:hover { background-color: #0056b3; }
+        .btn-add { background-color: #28a745; color: white; }
+        .btn-add:hover { background-color: #218838; }
+
+        form { margin-top: 20px; padding: 20px; border: 1px solid #007bff; border-radius: 8px; background-color: #eaf6ff; }
+        form input[type="text"], form input[type="date"] {
+            width: calc(100% - 24px); /* Ajusta a largura para o padding */
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box; /* Inclui padding na largura total */
+        }
+        form button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Minhas Tarefas</h1>
+
+        <form id="form-adicionar-tarefa">
+            <input type="text" id="input-titulo" placeholder="Título da Tarefa" required>
+            <input type="date" id="input-data-vencimento" required>
+            <input type="text" id="input-descricao" placeholder="Descrição (opcional)">
+            <button type="submit" class="btn-add">Adicionar Tarefa</button>
+        </form>
+
+        <h2>Lista de Tarefas</h2>
+        <ul id="tarefas-lista">
+            <li>Carregando tarefas...</li>
+        </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
