@@ -308,14 +308,17 @@ app.get('/tarefas/:id', authenticateToken, (req, res) => {
 
 // 3. PUTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 
+// Rota para atualizar uma tarefa (evento) por ID para o usuário logado (PUT - requer todos os campos)
 app.put('/tarefas/:id', authenticateToken, (req, res) => {
-    const id = parseInt(req.params.id);
+    console.log('[PUT Tarefas] Requisição recebida. ID:', req.params.id, ' User ID:', req.user.id); // <<< 1. PRIMEIRO PONTO
+    console.log('[PUT Tarefas] Body recebido:', req.body); // <<< 2. SEGUNDO PONTO
+
+    const { id } = req.params;
     const user_id = req.user.id;
-    // CORREÇÃO AQUI: Desestruture TODOS os novos campos
     const { titulo, descricao, data_evento, hora_inicio, hora_fim, local, concluida } = req.body;
 
-    // CORREÇÃO AQUI: Validação para PUT - todos os campos de evento são obrigatórios para uma ATUALIZAÇÃO COMPLETA
-    if (!titulo || !data_evento || !hora_inicio || concluida === undefined) { // Adicione checagem para hora_inicio e concluida
+    if (!titulo || !data_evento || !hora_inicio || concluida === undefined) {
+        console.log('[PUT Tarefas] Validação falhou: Campos obrigatórios ausentes.'); // <<< 3. PONTO DE VALIDAÇÃO
         return res.status(400).json({ mensagem: 'Título, data do evento, hora de início e status de conclusão são obrigatórios para atualização PUT.' });
     }
 
@@ -324,13 +327,14 @@ app.put('/tarefas/:id', authenticateToken, (req, res) => {
     const sql = `UPDATE tarefas SET
         titulo = ?,
         descricao = ?,
-        data_evento = ?,    <<<< CORRIGIDO AQUI
-        hora_inicio = ?,    <<<< NOVO CAMPO
-        hora_fim = ?,       <<<< NOVO CAMPO
-        local = ?,          <<<< NOVO CAMPO
+        data_evento = ?,
+        hora_inicio = ?,
+        hora_fim = ?,
+        local = ?,
         concluida = ?
         WHERE id = ? AND user_id = ?`;
 
+    console.log('[PUT Tarefas] Executando db.run(). SQL:', sql); // <<< 4. ANTES DO DB.RUN
     db.run(sql, [
         titulo,
         descricao || null,
@@ -342,7 +346,17 @@ app.put('/tarefas/:id', authenticateToken, (req, res) => {
         id,
         user_id
     ], function(err) {
-        // ... restante do código ...
+        console.log('[PUT Tarefas] Callback de db.run() iniciado.'); // <<< 5. INÍCIO DO CALLBACK DO DB
+        if (err) {
+            console.error('Erro ao atualizar tarefa (evento) via PUT:', err.message); // <<< 6. ERRO NO DB
+            return res.status(500).json({ mensagem: 'Erro interno do servidor ao atualizar evento.', erro: err.message });
+        }
+        if (this.changes === 0) {
+            console.log('[PUT Tarefas] Nenhuma alteração feita (evento não encontrado ou não pertence).'); // <<< 7. NENHUMA ALTERAÇÃO
+            return res.status(404).json({ mensagem: 'Evento não encontrado ou não pertence a este usuário.' });
+        }
+        console.log('[PUT Tarefas] Evento atualizado com sucesso. Changes:', this.changes); // <<< 8. SUCESSO!
+        res.status(200).json({ mensagem: 'Evento atualizado com sucesso.' });
     });
 });
 
