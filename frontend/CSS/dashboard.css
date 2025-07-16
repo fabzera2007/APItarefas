@@ -1,0 +1,408 @@
+        /* Cores roxas para o layout Trello-like */
+        :root {
+            --trello-main-bg: #282d31;
+            /* Roxo do fundo do quadro */
+            --trello-sidebar-bg: #282d31;
+            /* Roxo escuro da sidebar */
+            --trello-list-bg: #8c5cd6;
+            /* Roxo das listas */
+            --trello-card-bg: #ffffff;
+            /* Fundo do card */
+            --trello-dark-text: #172b4d;
+            /* Cor de texto escuro do Trello */
+            --trello-light-text: #b6c2cd;
+            /* Cor de texto claro do Trello */
+            --trello-primary-blue: #007bff;
+            /* Azul primário (mantido para ações) */
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--trello-main-bg);
+            /* Fundo da página */
+            overflow: hidden;
+            /* Evita scroll desnecessário */
+        }
+
+        /* Navbar */
+        .navbar-trello {
+            background-color: var(--trello-sidebar-bg);
+            /* Roxo escuro para a navbar */
+            color: white;
+            padding: 8px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-trello .navbar-brand,
+        .navbar-trello .nav-link,
+        .navbar-trello .btn-outline-light {
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .navbar-trello .form-control {
+            background-color: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .navbar-trello .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .navbar-trello .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.25);
+            box-shadow: none;
+            color: white;
+        }
+
+        .navbar-trello .btn-icon {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            margin-left: 10px;
+            padding: 0;
+        }
+
+        .navbar-trello .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #f7a627;
+            /* Cor de avatar de exemplo */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        /* Layout Principal do Dashboard */
+        .dashboard-wrapper {
+            display: flex;
+            height: calc(100vh - 56px);
+            /* Altura total menos a navbar */
+            overflow: hidden;
+        }
+
+
+
+        /* Sidebar (Trello-like Inbox) */
+        .sidebar-trello {
+            width: 260px;
+            background: linear-gradient(to bottom right, #7a5aad, #4f2d83);
+            color: rgb(231, 231, 231);
+            padding: 30px;
+            flex-shrink: 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+            margin: 50px 0 50px 30px;
+            ;
+            height: fit-content;
+
+            /* Scroll para sidebar se o conteúdo for grande */
+        }
+
+
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0;
+        }
+
+        .sidebar-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            display: none;
+            /* Esconder por padrão, mostrar em mobile */
+        }
+
+        .sidebar-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 10px;
+            margin-bottom: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .sidebar-menu-item:hover,
+        .sidebar-menu-item.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .sidebar-menu-item i {
+            margin-right: 10px;
+        }
+
+        .sidebar-separator {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 20px 0;
+        }
+
+        .sidebar-add-card-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 3px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .sidebar-add-card-btn:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Main Board Area */
+        .board-main {
+            flex-grow: 1;
+            background-color: var(--trello-main-bg);
+            /* Roxo principal do board */
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            /* Scroll horizontal para as listas */
+            align-items: flex-start;
+            /* Alinha listas ao topo */
+        }
+
+        .board-main::-webkit-scrollbar {
+            height: 12px;
+        }
+
+        .board-main::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+        }
+
+        .board-main::-webkit-scrollbar-track {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+
+        /* Task List (Coluna) */
+        .board-list {
+            min-width: 272px;
+            /* Largura padrão de listas do Trello */
+            max-width: 272px;
+            background-color: var(--trello-list-bg);
+            border-radius: 3px;
+            padding: 8px;
+            flex-shrink: 0;
+            height: fit-content;
+            /* Se ajusta ao conteúdo */
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0 4px;
+            /* Padding interno do header da lista */
+        }
+
+        .list-header h4 {
+            margin-bottom: 0;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .list-options-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .list-options-btn:hover {
+            color: white;
+        }
+
+        .list-cards-container {
+            max-height: calc(100vh - 200px);
+            /* Ajusta altura para scrollar cards */
+            overflow-y: auto;
+            /* Scroll vertical para cards da lista */
+            padding-right: 4px;
+            /* Espaço para scrollbar */
+        }
+
+        .list-cards-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .list-cards-container::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .list-cards-container::-webkit-scrollbar-track {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .add-card-in-list-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            width: 100%;
+            text-align: left;
+            padding: 8px 10px;
+            border-radius: 3px;
+            margin-top: 5px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .add-card-in-list-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .add-card-in-list-btn i {
+            margin-right: 5px;
+        }
+
+
+        /* Task Card */
+        .list-card {
+            background-color: var(--trello-card-bg);
+            border-radius: 3px;
+            padding: 10px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 0 rgba(9, 30, 66, .25);
+            /* Sombra sutil como no Trello */
+            cursor: pointer;
+            /* Indica que é clicável */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .list-card:hover {
+            background-color: #f4f5f7;
+            box-shadow: 0 2px 4px rgba(9, 30, 66, .25);
+        }
+
+        .list-card.done {
+            opacity: 0.7;
+            text-decoration: line-through;
+            color: #888;
+            background-color: #e2e4e6;
+            /* Cor cinza para concluído */
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--trello-dark-text);
+            margin-bottom: 8px;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .card-meta-item {
+            background-color: #f4f5f7;
+            border-radius: 3px;
+            padding: 4px 6px;
+            font-size: 0.75rem;
+            color: #5e6c84;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .card-meta-item.due-date {
+            background-color: #ebecf0;
+            /* Um pouco mais escuro para datas */
+        }
+
+        .card-meta-item i {
+            margin-right: 4px;
+            font-size: 0.8rem;
+        }
+
+        /* Ocultar elementos ao exibir a tela de boas-vindas */
+        .d-none {
+            display: none !important;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            background-color: #ffffff;
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 50px auto;
+            /* Centraliza na página */
+            max-width: 700px;
+            height: fit-content;
+        }
+
+        .welcome-screen h2 {
+            color: var(--trello-dark-text);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .welcome-screen p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        /* Modals */
+        .modal-header {
+            background-color: var(--trello-sidebar-bg);
+            color: white;
+            border-top-left-radius: calc(0.3rem - 1px);
+            /* Mantém o raio do modal */
+            border-top-right-radius: calc(0.3rem - 1px);
+        }
+
+        .modal-title {
+            color: white;
+        }
+
+        .modal-footer {
+            border-top: none;
+            padding-top: 0;
+        }

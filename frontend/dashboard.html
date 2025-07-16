@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda.AI - Meu Quadro de Tarefas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/dashboard.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-trello">
+        <div class="container-fluid">
+            <a class="navbar-brand me-4" href="#" id="homeLink">LOGO</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#dashNav" aria-controls="dashNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="dashNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-transparent border-0 text-white"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Pesquisar..." aria-label="Pesquisar" id="searchBar">
+                        </div>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item d-none d-lg-block">
+                        <button class="btn btn-icon" title="Criar novo evento" id="navAddEventBtn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item d-none d-lg-block">
+                        <button class="btn btn-icon" title="Notificações">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item d-none d-lg-block">
+                        <button class="btn btn-icon" title="Ajuda">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link text-white me-2">Olá, <strong id="userGreet">Usuário</strong>!</span>
+                    </li>
+                    <li class="nav-item">
+                        <button class="user-avatar" id="logoutBtn">
+                            <span id="userAvatarText">U</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-wrapper">
+        <div class="sidebar-trello">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-inbox me-2"></i> Inbox</h3>
+                <button class="sidebar-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-menu-item active" id="sidebarAllEvents">
+                    <i class="fas fa-th-large"></i> Meus Quadros
+                </div>
+                <div class="sidebar-menu-item" id="sidebarAddEvent">
+                    <i class="fas fa-plus"></i> Adicionar Evento
+                </div>
+            </div>
+            <div class="sidebar-separator"></div>
+            <div class="sidebar-section my-boards-section">
+                <h5 class="text-white-50 mb-3">Filtrar por Status</h5>
+                <div class="sidebar-menu-item" data-filter-status="all">
+                    <i class="fas fa-filter"></i> Todos
+                </div>
+                <div class="sidebar-menu-item" data-filter-status="pending">
+                    <i class="far fa-hourglass"></i> Pendentes
+                </div>
+                <div class="sidebar-menu-item" data-filter-status="completed">
+                    <i class="fas fa-check-circle"></i> Concluídos
+                </div>
+            </div>
+            <button class="sidebar-add-card-btn" id="sidebarAddCardFixedBtn">
+                <i class="fas fa-plus me-1"></i> Adicionar Cartão
+            </button>
+        </div>
+
+        <div id="welcomeScreen" class="welcome-screen">
+            <h2>Bem-vindo(a) à sua Agenda Pessoal, <span id="welcomeUserName"></span>!</h2>
+            <p>Organize seus compromissos e mantenha-se produtivo com nossos quadros intuitivos.</p>
+            <p>Use o menu "Adicionar Evento" na barra superior ou na lateral para criar seu primeiro compromisso, ou "Meus Quadros" para ver o panorama geral.</p>
+            <button class="btn btn-primary btn-lg mt-3" id="startAddingBtn">
+                <i class="fas fa-plus me-2"></i> Adicionar Evento
+            </button>
+            <button class="btn btn-outline-primary btn-lg mt-3 ms-3" id="startViewingBtn">
+                <i class="fas fa-th-large me-2"></i> Ver Meus Quadros
+            </button>
+        </div>
+
+        <div id="boardMainContent" class="board-main d-none">
+            <p class="text-center text-white-50" id="loadingBoards">Carregando seus quadros...</p>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEventModalLabel">Adicionar Novo Compromisso</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEventForm" class="row g-3">
+                        <div class="col-12">
+                            <label for="inputTitulo" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="inputTitulo" placeholder="Ex: Reunião com Cliente" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="inputData" class="form-label">Data do Evento</label>
+                            <input type="date" class="form-control" id="inputData" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="inputHoraIni" class="form-label">Hora de Início</label>
+                            <input type="time" class="form-control" id="inputHoraIni" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="inputHoraFim" class="form-label">Hora de Término (Opcional)</label>
+                            <input type="time" class="form-control" id="inputHoraFim">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="inputLocal" class="form-label">Local (Opcional)</label>
+                            <input type="text" class="form-control" id="inputLocal" placeholder="Ex: Sala de Reuniões 3">
+                        </div>
+                        <div class="col-12">
+                            <label for="inputDesc" class="form-label">Descrição (Opcional)</label>
+                            <textarea class="form-control" id="inputDesc" rows="3" placeholder="Detalhes do compromisso..."></textarea>
+                        </div>
+                        <div id="addEventAlerts" class="col-12 mt-3"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="addEventForm" class="btn btn-primary">Adicionar Evento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Detalhes do Compromisso</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editEventForm">
+                        <input type="hidden" id="editId">
+                        <div class="mb-3">
+                            <label for="editTitulo" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="editTitulo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editData" class="form-label">Data do Evento</label>
+                            <input type="date" class="form-control" id="editData" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editHoraIni" class="form-label">Hora de Início</label>
+                            <input type="time" class="form-control" id="editHoraIni" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editHoraFim" class="form-label">Hora de Término (Opcional)</label>
+                            <input type="time" class="form-control" id="editHoraFim">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editLocal" class="form-label">Local (Opcional)</label>
+                            <input type="text" class="form-control" id="editLocal">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDesc" class="form-label">Descrição (Opcional)</label>
+                            <textarea class="form-control" id="editDesc" rows="3"></textarea>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="editConcluida">
+                            <label class="form-check-label" for="editConcluida">
+                                Concluído
+                            </label>
+                        </div>
+                        <div id="editEventAlerts" class="alert-area"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" form="editEventForm" class="btn btn-primary">Salvar</button>
+                    <button type="button" class="btn btn-danger" id="deleteEventBtn">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="JS/dashboard.js"></script>
+</body>
+</html>

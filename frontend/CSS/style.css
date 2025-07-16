@@ -1,224 +1,107 @@
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f2f5;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+/* Cores principais */
+:root {
+    --primary-blue: #007bff;
+    /* Azul vibrante do Bootstrap */
+    --dark-blue: #0056b3;
+    /* Azul mais escuro para títulos */
+    --light-bg: #f8f9fa;
+    /* Cor de fundo clara */
+    --text-muted: #6c757d;
+    /* Cor de texto padrão Bootstrap */
+}
 
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 900px;
-            width: 100%;
-            margin-bottom: 20px;
-        }
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: var(--light-bg);
+}
 
-        h1,
-        h2 {
-            text-align: center;
-            color: #007bff;
-            margin-bottom: 25px;
-        }
+.text-primary {
+    color: var(--primary-blue) !important;
+}
 
-        .auth-section,
-        .events-section {
-            border: 1px solid #e0e0e0;
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
+.text-dark-blue {
+    color: var(--dark-blue);
+}
 
-        .auth-section h2,
-        .events-section h2 {
-            margin-top: 0;
-            color: #555;
-        }
+/* Navbar */
+.navbar-brand {
+    font-size: 1.5rem;
+}
 
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+.nav-link.btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: bold;
+}
 
-        form label {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+/* Hero Section */
+.hero-section {
+    background-color: #ffffff;
+    /* Fundo branco para a hero */
+    padding: 80px 0;
+    min-height: 80vh;
+    /* Ocupa a maior parte da tela */
+    display: flex;
+    align-items: center;
+}
 
-        form input[type="text"],
-        form input[type="email"],
-        form input[type="password"],
-        form input[type="date"],
-        form input[type="time"] {
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1em;
-            width: 100%;
-            box-sizing: border-box;
-        }
+.hero-section h1 {
+    font-size: 3.5rem;
+    line-height: 1.2;
+}
 
-        form button {
-            padding: 12px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.1em;
-            transition: background-color 0.3s ease;
-        }
+.hero-section p {
+    font-size: 1.25rem;
+}
 
-        form button:hover {
-            background-color: #0056b3;
-        }
+.hero-section img {
+    max-width: 700px;
+    margin-top: 40px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
 
-        .form-row {
-            display: flex;
-            gap: 15px;
-            width: 100%;
-        }
+/* Features Section */
+.features-section {
+    background-color: #eaf6ff;
+    /* Um azul bem clarinho para a seção de features */
+}
 
-        .form-row>div {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
+.feature-card {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
 
-        #auth-status {
-            text-align: center;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
 
-        #auth-status.logged-in {
-            color: #28a745;
-        }
+.feature-card h3 {
+    margin-bottom: 15px;
+    font-weight: bold;
+}
 
-        #auth-status.logged-out {
-            color: #dc3545;
-        }
+/* Call to Action Section */
+.cta-section {
+    background-color: var(--primary-blue);
+}
 
-        #logout-btn {
-            background-color: #ffc107;
-            color: #333;
-            margin-top: 15px;
-            width: auto;
-            align-self: flex-end;
-            padding: 10px 15px;
-            font-size: 0.9em;
-        }
+.cta-section h2 {
+    font-size: 3rem;
+}
 
-        #logout-btn:hover {
-            background-color: #e0a800;
-        }
+.cta-section .btn {
+    border-radius: 25px;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+}
 
-        #events-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        #events-list li {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-left: 5px solid #007bff;
-            padding: 15px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            position: relative;
-        }
-
-        #events-list li strong {
-            color: #007bff;
-            font-size: 1.1em;
-        }
-
-        #events-list li p {
-            margin: 0;
-            font-size: 0.95em;
-            color: #555;
-        }
-
-        #events-list li .event-time-location {
-            font-style: italic;
-            color: #777;
-        }
-
-        #events-list li .event-buttons {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            display: flex;
-            gap: 8px;
-        }
-
-        #events-list li .event-buttons button {
-            padding: 6px 10px;
-            font-size: 0.85em;
-            border-radius: 4px;
-        }
-
-        .btn-edit {
-            background-color: #17a2b8;
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background-color: #138496;
-        }
-
-        .btn-delete {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background-color: #c82333;
-        }
-
-        .btn-toggle {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btn-toggle:hover {
-            background-color: #218838;
-        }
-
-        .event-concluido {
-            text-decoration: line-through;
-            opacity: 0.7;
-            background-color: #e2f0d9;
-            border-color: #c3e6cb;
-            border-left-color: #28a745;
-        }
-
-        .event-concluido strong {
-            color: #28a745;
-        }
-
-        .event-concluido p {
-            color: #888;
-        }
-
-        #edit-form-section {
-            display: none;
-            margin-top: 20px;
-            border: 1px solid #ffc107;
-            padding: 20px;
-            border-radius: 8px;
-            background-color: #fff3cd;
-        }
-
-        #edit-form-section.active {
-            display: block;
-        }
+/* Footer */
+.footer {
+    background-color: #212529;
+    /* Cor escura para o rodapé */
+}
