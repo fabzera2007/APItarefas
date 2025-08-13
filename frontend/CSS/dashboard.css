@@ -1,10 +1,10 @@
         /* Cores roxas para o layout Trello-like */
         :root {
-            --trello-main-bg: #282d31;
+            --trello-main-bg: #374b3c;
             /* Roxo do fundo do quadro */
             --trello-sidebar-bg: #282d31;
             /* Roxo escuro da sidebar */
-            --trello-list-bg: #8c5cd6;
+            --trello-list-bg: #a1a1a1;
             /* Roxo das listas */
             --trello-card-bg: #ffffff;
             /* Fundo do card */
@@ -100,7 +100,7 @@
         /* Sidebar (Trello-like Inbox) */
         .sidebar-trello {
             width: 260px;
-            background: linear-gradient(to bottom right, #7a5aad, #4f2d83);
+            background: linear-gradient(to bottom right, #030105, #1f551d);
             color: rgb(231, 231, 231);
             padding: 30px;
             flex-shrink: 0;
@@ -217,11 +217,13 @@
             max-width: 272px;
             background-color: var(--trello-list-bg);
             border-radius: 3px;
-            padding: 8px;
+            padding: 10px;
             flex-shrink: 0;
             height: fit-content;
             /* Se ajusta ao conteúdo */
             box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+            margin-top: 40px;
+
         }
 
         .list-header {
@@ -366,7 +368,7 @@
 
         /* Welcome Screen */
         .welcome-screen {
-            background-color: #ffffff;
+            background-color: #d6cdcd;
             padding: 50px;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -377,15 +379,20 @@
             height: fit-content;
         }
 
+        .botoes-container {
+            display: flex;
+            gap: 15px; /* Espaço entre os botões, ajuste como precisar */
+            margin-top: 15px; /* Ajusta o espaçamento do contêiner dos botões com o parágrafo acima */
+}   
         .welcome-screen h2 {
-            color: var(--trello-dark-text);
+            color: #374b3c;
             font-size: 2.5rem;
-            margin-bottom: 20px;
+            margin-bottom: 40px;
         }
 
         .welcome-screen p {
             font-size: 1.1rem;
-            color: #555;
+            color: #000000;
             margin-bottom: 30px;
         }
 

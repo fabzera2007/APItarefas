@@ -84,7 +84,7 @@ const db = new sqlite3.Database('./tasks.db', (err) => {
             data_evento TEXT NOT NULL,
             hora_inicio TEXT NOT NULL,
             hora_fim TEXT,
-            local TEXT,  -- <<< CORRIGIDO AQUI: SEM ESPAÇO EXTRA
+            local TEXT,  
             concluida INTEGER DEFAULT 0,
             data_criacao TEXT NOT NULL,
             user_id INTEGER NOT NULL,
